@@ -1,0 +1,42 @@
+Configuration:
+  properties:
+    property:
+      - name: LOG_EXCEPTION_CONVERSION_WORD
+        value: "%xwEx"
+      - name: LOG_LEVEL_PATTERN
+        value: "%5p"
+      - name: LOG_DATEFORMAT_PATTERN
+        value: "yyyy-MM-dd HH:mm:ss.SSS"
+      - name: CONSOLE_LOG_PATTERN
+        value: "%d{${LOG_DATEFORMAT_PATTERN}} %highlight{${LOG_LEVEL_PATTERN}}{TRACE=blue} %style{%pid}{Magenta} ---
+        [%15.15t] %style{%-40.40c{1.}}{Cyan} : %m%n${sys:LOG_EXCEPTION_CONVERSION_WORD}"
+      - name: FILE_LOG_PATTERN
+        value: "%d{${LOG_DATEFORMAT_PATTERN}} ${LOG_LEVEL_PATTERN} %pid --- [%t] %-40.40c{1.} : %m%n${sys:LOG_EXCEPTION_CONVERSION_WORD}"
+      - name: LOG_DIR
+        value: "logs"
+      - name: ARCHIVED_FILE_PATTERN
+        value: ${LOG_DIR}/$${date:yyyy-MM}/%d{yyyy-MM-dd-HH}
+  appenders:
+    Console:
+      name: STDOUT
+      PatternLayout:
+        Pattern: ${CONSOLE_LOG_PATTERN}
+    RollingFile:
+      - name: AllFile
+        fileName: ${LOG_DIR}/all.log
+        filePattern: ${ARCHIVED_FILE_PATTERN}-all-%i.log.gz
+        PatternLayout:
+          Pattern: ${FILE_LOG_PATTERN}
+        policies:
+          CronTriggeringPolicy:
+            schedule: "0 0 * * * ?"
+          SizeBasedTriggeringPolicy:
+            size: 20MB
+        DefaultRolloverStrategy:
+          max: 10
+  Loggers:
+    Root:
+      level: info
+      AppenderRef:
+        - ref: AllFile
+        - ref: STDOUT

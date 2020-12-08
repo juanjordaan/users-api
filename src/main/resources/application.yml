@@ -1,0 +1,60 @@
+server:
+  port: 8080
+
+---
+
+info:
+  app:
+    name: @name@
+    description: @description@
+    version: @version@
+    java:
+      version:@java.version@
+
+---
+
+management:
+  endpoint:
+    health:
+      show-details: always
+      enabled: true
+    info.enabled: true
+    metrics.enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+---
+
+spring.security.user:
+  name: test
+  password: test
+
+---
+# Database H2 config
+# Does not work in Webflux :(
+#spring.h2.console:
+#  enabled: true
+#  path: /h2-console
+#  settings:
+#    trace: false
+#    web-allow-others: false
+#
+#---
+
+# Custom settings
+#spring.session.timeout: 3m
+security.disable-csrf: false
+#custom.session.expire.seconds: 180000
+
+springbootwebfluxjjwt:
+  jjwt:
+    secret: averylongkeytosatisfysomeencryptionrequirements
+    expiration: 180
+#  expiration: 28800
+  password.encoder:
+    secret: mysecret
+    keylength: 256
+    iteration: 33
+
