@@ -1,13 +1,15 @@
 # Users API
+* Webflux and JWT
+* Token expiration is set in src/resource/properties.yaml and is refreshed, thereby creating a timeout.
 
 ## Requirements
 * Maven
 * Java 11
 
 ## Compile
-
 * mvn compile package
 
+## Run
 * mvn spring-boot:run
 
 
@@ -24,3 +26,5 @@
 * register url  : http://localhost:8080/register
 * login    url  : http://localhost:8080/login
 * users    url  : http://localhost:8080/api/v1/users/
+* actuator url  : http://localhost:8080/actuator/health
+* swagger  url  : http://localhost:8080/v2/api-docs/
