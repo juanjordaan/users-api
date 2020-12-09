@@ -1,7 +1,7 @@
 # Users API
 * Webflux and JWT
 * Token expiration is set in src/resource/properties.yaml and is refreshed, thereby creating a timeout.
-
+* A user admin/admin is created at stratup
 ## Requirements
 * Maven
 * Java 11
