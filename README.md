@@ -7,9 +7,12 @@
 * Java 11
 
 ## Compile
-* mvn compile package
+* mvn clean compile package
 
-## Run
+## Docker Run
+* docker-compose up -d
+
+## Java Run
 * mvn spring-boot:run
 
 
