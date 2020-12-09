@@ -3,6 +3,7 @@ package cloud.jordaan.juan.kinetic.application.scqresque.query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,18 +23,25 @@ public class UserQueryService {
 
 	public Mono<User> findByUsername(String userName) {
 		logger.info("findByUsername = " + userName);
-		return userRepository.findByUsername(userName);
+		return userRepository
+				.findByUsername(userName)
+				.switchIfEmpty(Mono.defer(() -> Mono.error(new UsernameNotFoundException("User Not Found userName " + userName))))
+				;
 	}
 
 	public Mono<User> getById(Long id) {
 		logger.info("getById = " + id);
-		return userRepository.findById(id);
+		return userRepository
+				.findById(id)
+				.switchIfEmpty(Mono.defer(() -> Mono.error(new UsernameNotFoundException("User Not Found id " + id))))
+				;
 	}
 
 	public Mono<UserContactDetails> getUserContactDetails(Long id) {
 		logger.info("getUserContactDetails = " + id);
 		return Mono
 			.from(userRepository.findById(id))
+			.switchIfEmpty(Mono.defer(() -> Mono.error(new UsernameNotFoundException("User Not Found id " + id))))
 			.map(i -> {
 				return new UserContactDetails(i.getId(), i.getUsername(), i.getPhone());
 			});
