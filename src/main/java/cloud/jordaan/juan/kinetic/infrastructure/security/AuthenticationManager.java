@@ -13,6 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
@@ -26,6 +27,44 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
 	private TokenProvider tokenProvider;
 
 	@Override
+	@SuppressWarnings("unchecked")
+	public Mono<Authentication> authenticate(Authentication authentication) {
+		return Mono.just(authentication.getCredentials().toString())
+			.switchIfEmpty(Mono.defer(() -> 
+				Mono.error(new RuntimeException("Failed to extract token"))
+			))
+			.flatMap((authToken) -> {
+				String username = tokenProvider.getUsernameFromToken(authToken);
+				return Mono.just(new String [] { username, authToken });
+			})
+			.switchIfEmpty(Mono.defer(() -> 
+				Mono.error(new RuntimeException("Failed to extract username from token"))
+			))
+			.filter((arr) -> {
+				return !tokenProvider.isTokenExpired(arr[1]);
+			})
+			.switchIfEmpty(Mono.defer(() -> {
+				logger.debug("Nothing to authenticate");
+				return Mono.empty();
+			}))
+			.flatMap((arr) -> {
+				Claims claims = tokenProvider.getAllClaimsFromToken(arr[1]);
+				List<String> roles = claims.get(AUTHORITIES_KEY, List.class);
+				List<SimpleGrantedAuthority> authorities = roles
+					.stream()
+					.map(role -> new SimpleGrantedAuthority(role))
+					.collect(Collectors.toList());
+				tokenProvider.refreshToken(arr[1]);
+	            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(arr[0], arr[0], authorities);
+	            SecurityContextHolder.getContext().setAuthentication(new AuthenticatedUser(arr[0], authorities));
+
+	            logger.debug("Authenticated " + arr[0]);
+	            return Mono.just(auth);
+			})
+			;
+	}
+	
+	/*@Override
 	@SuppressWarnings("unchecked")
 	public Mono<Authentication> authenticate(Authentication authentication) {
 		String authToken = authentication.getCredentials().toString();
@@ -54,5 +93,5 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
 			logger.debug("Nothing to authenticate");
 			return Mono.empty();
 		}
-	}
+	}*/
 }
