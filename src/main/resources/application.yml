@@ -44,15 +44,12 @@ spring.security.user:
 #---
 
 # Custom settings
-#spring.session.timeout: 3m
 security.disable-csrf: false
-#custom.session.expire.seconds: 180000
 
 springbootwebfluxjjwt:
   jjwt:
     secret: averylongkeytosatisfysomeencryptionrequirements
     expiration: 180
-#  expiration: 28800
   password.encoder:
     secret: mysecret
     keylength: 256
