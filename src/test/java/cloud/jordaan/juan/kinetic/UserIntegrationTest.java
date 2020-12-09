@@ -10,19 +10,16 @@ import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.reactive.server.WebTestClient.ResponseSpec;
-import org.springframework.util.Base64Utils;
 import org.springframework.web.reactive.function.BodyInserters;
 
 import cloud.jordaan.juan.kinetic.application.scqresque.command.model.UserCommandResponse;
 import cloud.jordaan.juan.kinetic.application.scqresque.command.model.UserContactUpdateCommand;
 import cloud.jordaan.juan.kinetic.application.scqresque.command.model.UserCreateCommand;
 import cloud.jordaan.juan.kinetic.application.scqresque.query.model.UserContactDetails;
-import cloud.jordaan.juan.kinetic.infrastructure.persistence.entity.User;
 import cloud.jordaan.juan.kinetic.interfaces.rest.Controllers;
 
 @RunWith(SpringRunner.class)
@@ -86,7 +83,7 @@ public class UserIntegrationTest extends AbstractIntegrationTest {
 		return testClient
 				.post()
 					.uri(USERS_URL)
-					.body(BodyInserters.fromObject(user))
+					.body(BodyInserters.fromValue(user))
 				.exchange();
 	}
 

@@ -16,34 +16,19 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.reactive.server.WebTestClient;
 
 import cloud.jordaan.juan.kinetic.application.scqresque.command.model.AuthenticationCommand;
 import cloud.jordaan.juan.kinetic.application.scqresque.query.model.UserContactDetails;
 import cloud.jordaan.juan.kinetic.client.SecurityClient;
 import cloud.jordaan.juan.kinetic.client.SecurityUtil;
 import cloud.jordaan.juan.kinetic.client.UsersClient;
-import cloud.jordaan.juan.kinetic.interfaces.rest.Controllers;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = UsersApplication.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class AuthResolverIntegrationTest extends AbstractIntegrationTest {
 	@Autowired
-	private WebTestClient testClient;
-
-	@Autowired
-	TestRestTemplate restTemplate;
-
-	@Test
-	public void givenUserCredential_whenHome_thenExpect401Status() {
-		testClient
-			.get()
-			.uri(Controllers.USERS_URL)
-			.exchange()
-			.expectStatus()
-			.isUnauthorized();
-	}
+	private TestRestTemplate restTemplate;
 
 	@Test
 	public void givenCredential_whenUsersList_thenExpectOk() {
