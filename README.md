@@ -9,6 +9,9 @@
 ## Compile
 * mvn clean compile package
 
+## Docker Run
+* docker-compose up -d
+
 ## Java Run
 * mvn spring-boot:run
 
