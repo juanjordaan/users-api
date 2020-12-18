@@ -1,5 +1,7 @@
 package cloud.jordaan.juan.kinetic.interfaces.rest;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,8 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import cloud.jordaan.juan.kinetic.application.scqresque.command.UserCommandService;
 import cloud.jordaan.juan.kinetic.application.scqresque.command.model.UserCommandResponse;
-import cloud.jordaan.juan.kinetic.application.scqresque.command.model.UserCreateCommand;
 import cloud.jordaan.juan.kinetic.application.scqresque.command.model.UserContactUpdateCommand;
+import cloud.jordaan.juan.kinetic.application.scqresque.command.model.UserCreateCommand;
 import cloud.jordaan.juan.kinetic.application.scqresque.query.UserQueryService;
 import cloud.jordaan.juan.kinetic.application.scqresque.query.model.UserContactDetails;
 import reactor.core.publisher.Flux;
@@ -42,12 +44,12 @@ public class UserController {
 
 //	@PreAuthorize("hasRole('Guest')")
 	@PostMapping
-	public Mono<UserCommandResponse> createUser(@RequestBody UserCreateCommand user) {
+	public Mono<UserCommandResponse> createUser(@Valid @RequestBody UserCreateCommand user) {
 		return commandService.createUser(user);
 	}
 
 	@PutMapping("/{id}")
-	public Mono<UserCommandResponse> updateUser(@PathVariable("id") Long id, @RequestBody UserContactUpdateCommand user) {
+	public Mono<UserCommandResponse> updateUser(@PathVariable("id") Long id, @Valid @RequestBody UserContactUpdateCommand user) {
 		return commandService.updateUser(id, user);
 	}
 
