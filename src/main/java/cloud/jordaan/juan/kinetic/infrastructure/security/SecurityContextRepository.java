@@ -31,12 +31,21 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
 	public Mono<SecurityContext> load(ServerWebExchange swe) {
 		return Mono
 			.just(swe)
-			.map(s -> s.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION))
+			.map(s -> {
+				String authorization = s.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+				if(authorization !=null)
+					return authorization;
+				return "";
+			})
+			/*.switchIfEmpty(Mono.defer(() -> {
+				logger.warn("couldn't find Authorization header, will ignore the header.");
+				return Mono.empty();
+			}))*/
 			.filter(h -> {
 				return h != null && h.startsWith(Jwt.BEARER_TOKEN_TYPE);
 			})
 			.switchIfEmpty(Mono.defer(() -> {
-				logger.warn("couldn't find bearer string, will ignore the header.");
+//				logger.warn("couldn't find bearer string, will ignore the header.");
 				return Mono.empty();
 			}))
 			.flatMap(authHeader -> {

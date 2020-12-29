@@ -18,6 +18,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import cloud.jordaan.juan.kinetic.application.exception.ApplicationException;
+import io.jsonwebtoken.ExpiredJwtException;
 import reactor.core.publisher.Mono;
 
 @Configuration
@@ -34,11 +35,9 @@ public class ErrorHandler implements ErrorWebExceptionHandler {
 	// TODO - This could be better :/
 	@Override
 	public Mono<Void> handle(ServerWebExchange serverWebExchange, Throwable throwable) {
-		throwable.printStackTrace();
-		logger.error(throwable.getMessage());
+		logger.error(throwable.getMessage(), throwable);
 		DataBufferFactory bufferFactory = serverWebExchange.getResponse().bufferFactory();
 		if (throwable instanceof ApplicationException) {
-			logger.info("Return ApplciationException to client :" + throwable.getMessage());
 			serverWebExchange.getResponse().setStatusCode(HttpStatus.BAD_REQUEST);
 			DataBuffer dataBuffer = null;
 			try {
@@ -82,9 +81,19 @@ public class ErrorHandler implements ErrorWebExceptionHandler {
 				dataBuffer = bufferFactory.wrap("".getBytes());
 			}
 			return serverWebExchange.getResponse().writeWith(Mono.just(dataBuffer));
+		} else if ( throwable instanceof ExpiredJwtException ) {
+			serverWebExchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+			serverWebExchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
+			DataBuffer dataBuffer = null;
+			try {
+				dataBuffer = bufferFactory.wrap(objectMapper.writeValueAsBytes(((ExpiredJwtException)throwable).getMessage()));
+			} catch (JsonProcessingException e) {
+				dataBuffer = bufferFactory.wrap("".getBytes());
+			}
+			return serverWebExchange.getResponse().writeWith(Mono.just(dataBuffer));
 		}
 
-		logger.info("Return INTERNAL_SERVER_ERROR to client :" + throwable.getMessage());
+		logger.error("Return INTERNAL_SERVER_ERROR to client :" + throwable.getMessage());
 		serverWebExchange.getResponse().setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
 		serverWebExchange.getResponse().getHeaders().setContentType(MediaType.TEXT_EVENT_STREAM);
 		DataBuffer dataBuffer = bufferFactory.wrap(throwable.getMessage().getBytes());

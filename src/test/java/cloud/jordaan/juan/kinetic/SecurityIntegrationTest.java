@@ -27,7 +27,7 @@ public class SecurityIntegrationTest extends AbstractIntegrationTest {
 	private TestRestTemplate restTemplate;
 
 	@Test
-	public void whenGetFeaturesWithNoCredentials_thenReturns401() throws IOException {
+	public void whenGetActuatorWithNoCredentials_thenReturns401() throws IOException {
 		// when
 		final ResponseEntity<String> responseEntity = restTemplate.exchange("/actuator", HttpMethod.GET, SecurityUtil.setAuthCookie(""), new ParameterizedTypeReference<String>() {}, new HashMap<>());
 
